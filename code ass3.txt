@@ -1,0 +1,110 @@
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace GuessTheNumberGame
+{
+    public partial class Form1 : Form
+    {
+        private int targetNumber;
+        private bool gameActive;
+
+        public Form1()
+        {
+            InitializeComponent();
+            InitializeGame();
+        }
+
+        private void InitializeGame()
+        {
+            Random random = new Random();
+            targetNumber = random.Next(1, 1001);
+            gameActive = true;
+
+            labelPrompt.Text = "I have a number between 1 and 1000--can you guess my number?";
+            labelResult.Text = "Please enter your first guess.";
+            textBoxGuess.Enabled = true;
+            buttonGuess.Enabled = true;
+            buttonPlayAgain.Enabled = false;
+            textBoxGuess.Text = "";
+            this.BackColor = SystemColors.Control;
+        }
+
+        private void buttonGuess_Click(object sender, EventArgs e)
+        {
+            if (!gameActive)
+            {
+                MessageBox.Show("Please start a new game.", "Game Over", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            int userGuess;
+            if (int.TryParse(textBoxGuess.Text, out userGuess))
+            {
+                CheckGuess(userGuess);
+            }
+            else
+            {
+                MessageBox.Show("Please enter a valid number.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void CheckGuess(int userGuess)
+        {
+            int difference = Math.Abs(targetNumber - userGuess);
+
+            if (difference == 0)
+            {
+                GameOver(true);
+            }
+            else
+            {
+                ChangeBackgroundColor(difference);
+                UpdateResultLabel(userGuess);
+            }
+        }
+
+        private void ChangeBackgroundColor(int difference)
+        {
+            if (difference < 10)
+            {
+                this.BackColor = Color.Red;
+            }
+            else
+            {
+                this.BackColor = Color.Blue;
+            }
+        }
+
+        private void UpdateResultLabel(int userGuess)
+        {
+            if (userGuess < targetNumber)
+            {
+                labelResult.Text = "Too Low";
+            }
+            else
+            {
+                labelResult.Text = "Too High";
+            }
+        }
+
+        private void GameOver(bool correctGuess)
+        {
+            gameActive = false;
+            buttonGuess.Enabled = false;
+            textBoxGuess.Enabled = false;
+            buttonPlayAgain.Enabled = true;
+
+            if (correctGuess)
+            {
+                MessageBox.Show("Correct!", "Congratulations", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.BackColor = Color.Green;
+            }
+        }
+
+        private void buttonPlayAgain_Click(object sender, EventArgs e)
+        {
+            InitializeGame();
+        }
+    }
+}
